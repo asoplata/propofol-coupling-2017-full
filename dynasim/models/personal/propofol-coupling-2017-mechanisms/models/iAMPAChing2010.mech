@@ -1,0 +1,33 @@
+% iAMPAChing2010: SCALED synaptic AMPAergic excitatory current
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm
+%   associated with loss of consciousness. Proceedings of the National Academy of
+%   Sciences, 107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Tags: synapse, connection, excitation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters
+gAMPA = 0.4 % mS/cm^2
+EAMPA = 1   % mV
+% EAMPA = 0
+IC = 0.1
+IC_noise = 0
+tauAMPA = 2
+
+% Connectivity
+% 'ones' so all-to-all connectivity
+netcon = ones(N_pre,N_post)
+
+% Functions
+% Note that because of `gAMPA/N_pre`, the total current to the target is scaled
+%   down by the number of source cells.
+IAMPAChing2010(X,s) = gAMPA/N_pre.*(s*netcon).*(X-EAMPA)
+
+% This way we record the synaptic currents!
+monitor functions
+
+% ODEs and ICs
+s' = 5.*(1 + tanh(X_pre./4)).*(1-s) - s./tauAMPA;
+s(0) = IC+IC_noise.*rand(1,N_pre);
+
+% Linker
+@current += -IAMPAChing2010(X_post,s)

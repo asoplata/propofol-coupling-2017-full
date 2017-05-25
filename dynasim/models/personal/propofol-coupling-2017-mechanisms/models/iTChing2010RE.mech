@@ -1,0 +1,34 @@
+% iTChing2010RE: T-type Calcium current, Hodgkin-Huxley-style, for generic
+%   thalamic reticular cells, corresponding to some combination of CaV 3.2 and 3.3
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm
+%   associated with loss of consciousness. Proceedings of the National Academy of
+%   Sciences, 107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Tags: calcium, current, intrinsic, thalamus
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters
+gT = 3;      % mS/cm^2
+ET = 120;    % mV
+% AES: needs testing, is 2 too high
+v_shift = 4; % mV
+% AES: omg, test these too
+phiM = 6.81;  % unitless, based on Q10 of 5
+phiH = 3.73;  % unitless, based on Q10 of 3
+
+% Functions
+% AES: for the time being, not using this
+% ET(Ca_RE) = 1000.*((8.31441.*309.15)./(2.*96846)).*log(2./Ca_RE); % mV
+Minf(X) = 1./(1+exp(-(X+v_shift+50)./7.4))
+tauM(X) = (3. + (1.0./(exp((X+v_shift+25)./10)+exp(-(X+v_shift+100)./15))))./phiM
+Hinf(X) = 1./(1+exp((X+v_shift+78)./5))
+tauH(X) = (85 + (1.0./(exp((X+v_shift+46)./4)+exp(-(X+v_shift+405)./50))))./phiH
+ITChing2010RE(X,mT,hT) = gT.*mT.^2.*hT.*(X-ET)
+
+% ODEs and ICs
+mT' = (Minf(X)-mT)./tauM(X);
+mT(0)=.04+.1.*rand(1,Npop);
+hT' = (Hinf(X)-hT)./tauH(X);
+hT(0)=.34+.1.*rand(1,Npop);
+
+% Interface
+@current += -ITChing2010RE(X,mT,hT)

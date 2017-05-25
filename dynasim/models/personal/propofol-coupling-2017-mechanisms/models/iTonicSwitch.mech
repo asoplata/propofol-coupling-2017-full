@@ -1,0 +1,18 @@
+% ITonicSwitch(t): tonic stimulus, with 2 switches for 3 different regimes of
+%   tonic applied current
+
+stim1=  0.7;
+stim2=  0.2;
+stim3= -0.3;
+
+onset1=[0];    % in ms
+onset2=[3000];
+onset3=[6000];
+offset=inf;
+
+ITonicSwitch(t) = stim1*((t >= onset1) & (t < onset2)) + stim2*((t >= onset2) & (t < onset3)) + stim3*((t >= onset3) & (t < offset))
+
+monitor functions
+
+% Linker
+@current += ITonicSwitch(t)

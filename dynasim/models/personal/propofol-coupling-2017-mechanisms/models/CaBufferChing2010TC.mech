@@ -1,0 +1,19 @@
+% CaBufferChing2010TC: Calcium buffer concentration dynamics, for generic thalamocortical
+%   relay cells
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm associated
+%   with loss of consciousness. Proceedings of the National Academy of Sciences,
+%   107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Requires: T-current "@ITChing2010TC" (exposed by "iTChing2010TC" mechanism)
+% Exposes: calcium concentration "@CaBuffer" for other mechanisms (e.g.,
+%   required by "iTChing2010TC" mechanism)
+% Tags: calcium, buffer, intrinsic, thalamus
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ODEs
+CaBuffer' = max(((-10.*@ITChing2010TC)./(2.*96489)), 0) + (0.00024-CaBuffer)./5;
+CaBuffer(0) = 0.0001.*rand(Npop,1);
+
+% monitor CaBuffer
+
+% Interface
+@CaBuffer += CaBuffer

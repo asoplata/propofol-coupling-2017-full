@@ -1,0 +1,28 @@
+% iNaChing2010RE: fast Sodium current, Hodgkin-Huxley-style, for generic
+%   thalamic reticular cell
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm
+%   associated with loss of consciousness. Proceedings of the National Academy of
+%   Sciences, 107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Tags: sodium, current, intrinsic, thalamus
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters
+gNa = 200;    % mS/cm^2
+ENa = 50;     % mV
+v_shift = 55; % mV
+
+% Functions
+aM(X) = .32.*(13-(X+v_shift))./(exp((13-(X+v_shift))./4)-1)
+bM(X) = .28.*((X+v_shift)-40)./(exp(((X+v_shift)-40)./5)-1)
+aH(X) = .128.*exp((17-(X+v_shift))./18)
+bH(X) = 4./(1+exp((40-(X+v_shift))./5))
+INaChing2010RE(X,mNa,hNa) = gNa.*mNa.^3.*hNa.*(X-ENa)
+
+% ODEs and ICs
+mNa' = aM(X).*(1-mNa)-bM(X).*mNa;
+mNa(0)=.05+.1.*rand(1,Npop);
+hNa' = aH(X).*(1-hNa)-bH(X).*hNa;
+hNa(0)=.54+.1.*rand(1,Npop);
+
+% Linker
+@current += -INaChing2010RE(X,mNa,hNa)

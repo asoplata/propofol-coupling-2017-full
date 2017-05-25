@@ -1,0 +1,4 @@
+# ITonic(t): tonic stimulus
+stim=15; onset=0; offset=inf;
+ITonic(t) = stim*(t>onset & t<offset)
+@current += ITonic(t)

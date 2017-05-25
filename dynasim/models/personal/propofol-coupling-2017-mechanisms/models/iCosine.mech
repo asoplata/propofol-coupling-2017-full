@@ -1,0 +1,7 @@
+% ICosine(t) sinusoidal stimulus of raw charge.
+cos_ampl = 2.5
+cos_freq = 0.6
+
+ICosine(t) = cos_ampl*cos(2*pi*cos_freq*t/1000)
+
+@current += ICosine(t)

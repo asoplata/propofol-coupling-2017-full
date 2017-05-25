@@ -1,0 +1,19 @@
+% iLeakChing2010TC: Leak current, Hodgkin-Huxley-style, for generic
+%   thalamocortical relay cells
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm
+%   associated with loss of consciousness. Proceedings of the National Academy of
+%   Sciences, 107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Tags: leak, current, intrinsic, thalamus
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters
+gLeak = 0.01; % mS/cm^2
+ELeak = -70;  % mV
+
+% Functions
+ILeakChing2010TC(X) = gLeak.*(X-ELeak)
+
+monitor functions
+
+% Linker
+@current += -ILeakChing2010TC(X)

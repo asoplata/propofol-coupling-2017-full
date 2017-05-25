@@ -1,0 +1,45 @@
+% iHChing2010TCSwitch: Hyperpolarization-activated H-current,
+%   Hodgkin-Huxley-style, for generic thalamocortical relay cells, with 2
+%   switches for 3 different regimes of gH
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm
+%   associated with loss of consciousness. Proceedings of the National Academy of
+%   Sciences, 107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Requires: calcium concentration "@CaBuffer" (exposed by "CaBufferChing2010TC" mechanism)
+% Tags: calcium, current, intrinsic, thalamus
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters
+EH = -43   % mV
+
+gH1 = 0.005 % mS/cm^2
+gH2 = 0.015
+gH3 = 0.025
+
+onset1 = [0]    % in ms
+onset2 = [3000]
+onset3 = [6000]
+offset = inf
+
+% Functions
+tauS(X) = 20 + 1000./(exp((X+71.5)./14.2)+exp((-(X+89))./11.6))
+Hinf(X) = 1./(1+exp((X+75)./5.5))
+aH(X) = Hinf(X)./tauS(X)
+bH(X) = (1-Hinf(X))./tauS(X)
+gH(t) = gH1*((t >= onset1) & (t < onset2)) + gH2*((t >= onset2) & (t < onset3)) + gH3*((t >= onset3) & (t < offset))
+IHChing2010TCSwitch(X,Cone,Pzero,OPENone,t) = gH(t).*(OPENone+2.*(1-Cone-OPENone)).*(X-EH)
+
+% Record all the things!
+monitor IHChing2010TC
+
+% ODEs and ICs
+Cone' = bH(X).*OPENone - aH(X).*Cone;
+Cone(0) = 0.5.*rand(1,Npop);
+% Note: here, it uses the external @CaBuffer
+Pzero' = 0.0004.*(1-Pzero) - 0.0004.*((@CaBuffer./0.002).^4).*Pzero;
+Pzero(0) = 0.5.*rand(1,Npop);
+% AES: change this
+OPENone' = 0.001.*(1-Cone-OPENone) - 0.001.*((Pzero)./0.01).*OPENone;
+OPENone(0) = 0.*rand(1,Npop);
+
+% Linker
+@current += -IHChing2010TCSwitch(X,Cone,Pzero,OPENone,t)

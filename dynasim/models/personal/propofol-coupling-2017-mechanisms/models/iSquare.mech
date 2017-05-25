@@ -1,0 +1,8 @@
+% ISquare: Provide a square wave of pure, applied current into the cell
+
+square_amp = 2
+square_freq = 0.6
+
+ISquare(t) = square_amp./2 + square_amp./2.*square(2.*pi.*square_freq.*t./1000)
+
+@current += ISquare(t)

@@ -1,0 +1,46 @@
+% iGABAAChing2010Switch: SCALED synaptic GABA-A-ergic inhibitory current, with
+%   2 switches for 3 different regimes of gGABAA_base and tauGABAA_base strength
+% Reference: "Ching, S., Cimenser, A., Purdon, P. L., Brown, E. N., & Kopell, N.
+%   J. (2010). Thalamocortical model for a propofol-induced alpha-rhythm
+%   associated with loss of consciousness. Proceedings of the National Academy of
+%   Sciences, 107(52), 22665-22670. doi:10.1073/pnas.1017069108"
+% Tags: synapse, connection, inhibition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters
+% `gGABAA_base` and `tauGABAA_base` are the before-propofol values that are
+%   multiplied by `spm`
+spm1 = 1 % stands for "synaptic propofol multipler" of both gGABAA_base and tauGA
+spm2 = 2 % 'spm2' is if you want to change the spm factor upon time > `onset2`
+spm3 = 3 % 'spm3' is if you want to change the spm factor upon time > `onset3`
+
+onset1 = [0]    % in ms
+onset2 = [3000]
+onset3 = [6000]
+offset = inf
+
+gGABAA_base = 0.1
+tauGABAA_base = 5 % ms
+EGABAA = -80
+IC = 0.1
+IC_noise = 0.1
+
+% Connectivity
+% 'ones' so all-to-all connectivity
+netcon = ones(N_pre,N_post)
+
+% Functions
+gGABAA(t) = gGABAA_base*spm1*((t >= onset1) & (t < onset2)) + gGABAA_base*spm2*((t >= onset2) & (t < onset3)) + gGABAA_base*spm3*((t >= onset3) & (t < offset))
+tauGABAA(t) = tauGABAA_base*spm1*((t >= onset1) & (t < onset2)) + tauGABAA_base*spm2*((t >= onset2) & (t < onset3)) + tauGABAA_base*spm3*((t >= onset3) & (t < offset))
+% Note that because of `gGABAA/N_pre`, the total current to the target is scaled
+%   down by the number of source cells.
+IGABAAChing2010Switch(X,s,t) = gGABAA(t)/N_pre.*(s*netcon).*(X-EGABAA)
+
+% This way we record the synaptic currents!
+monitor functions
+
+% ODEsa and ICs
+s' = 2.*(1 + tanh(X_pre./4)).*(1-s) - s./tauGABAA(t);
+s(0) = IC+IC_noise.*rand(1,Npre);
+
+% Linker
+@current += -IGABAAChing2010Switch(X_post,s,t)
