@@ -19,9 +19,9 @@ Adding the `dynasim` directory and all its subdirectories to your MATLAB path
 should enable you to run all the simulations for the
 computational thalamus from:
 
-    Soplata, A. E., McCarthy, M. M., Sherfey, J. Lee, S., Purdon, P. L.,
-    Brown, E. N., & Kopell, N. J. (2017). Thalamocortical control of propofol
-    phase-amplitude coupling. In preparation.
+    Soplata AE, McCarthy MM, Sherfey J, Lee S, Purdon PL, Brown EN, et al.
+    (2017) Thalamocortical control of propofol phase-amplitude coupling. PLoS
+    Comput Biol 13(12): e1005879. https://doi.org/10.1371/journal.pcbi.1005879
 
 This model was inherited from:
 
